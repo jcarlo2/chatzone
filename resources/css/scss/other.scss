@@ -1,0 +1,41 @@
+@mixin flexCenter($direction, $gap) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: $direction;
+  gap: $gap;
+}
+
+@mixin defaultInput {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 200px;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+@mixin defaultBtn {
+  box-shadow: 1px 2px rgba(0,0,0,0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  &:hover {
+    background: #cebaba;
+  }
+  &:active {
+    transform:translateY(2px);
+  }
+}
+
+@keyframes typing {
+  0% { content: '.'; }
+  60% { content: '..'; }
+  80% { content: '...'; }
+  100% { content: ''; }
+}

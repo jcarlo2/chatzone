@@ -1,0 +1,17 @@
+.login-container {
+  width: 400px;
+  height: 250px;
+  border-radius: 10px;
+  @include flexCenter(column, 5px);
+  > input {
+    @include defaultInput;
+    width: 250px;
+    &[type=submit] {
+      @include defaultBtn;
+      width: 150px;
+    }
+  }
+  > label {
+    @include flexCenter(row, 5px);
+  }
+}

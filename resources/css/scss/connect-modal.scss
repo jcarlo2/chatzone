@@ -1,0 +1,74 @@
+.connect-modal {
+    background: #995f46;
+    > h1 {
+      text-align: center;
+    }
+    > input[type=text] {
+      @include defaultInput;
+      width: 250px;
+      margin: 0 auto;
+    }
+    overflow-y: auto;
+    > section {
+      overflow-y: auto;
+      height: 100%;
+      > table {
+        height: 100%;
+        width: 100%;
+        overflow-y: auto;
+        tbody {
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          min-height: 100%;
+          tr {
+            width: 100%;
+            display: flex;
+            gap: 5px;
+            cursor: pointer;
+            &:hover > td:nth-child(2) {
+              p {
+                scale: 1.2;
+                color: #e3d3d3;
+              }
+            }
+            td {
+              height: 50px;
+              @include flexCenter(row, 0);
+              &:first-child {
+                border-radius: 50%;
+                border: 1px black solid;
+                width: 50px;
+                height: 50px;
+              }
+              &:last-child {
+                width: 100px;
+                height: 50px;
+                > input {
+                  @include defaultBtn;
+                  height: 50px;
+                  background: linear-gradient(#68d5b5, #8ea926);
+                  &:hover {
+                    background: linear-gradient(#68d5b5, #8ea926);
+                  }
+                }
+              }
+              &:nth-child(2) {
+                flex: 2;
+                padding: 5px;
+                p {
+                  font-weight: bold;
+                  text-align: center;
+                  width: 300px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

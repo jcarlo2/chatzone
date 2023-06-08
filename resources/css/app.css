@@ -1,0 +1,560 @@
+@keyframes typing {
+  0% {
+    content: ".";
+  }
+  60% {
+    content: "..";
+  }
+  80% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --light-blue: linear-gradient(45deg, #78b2be, #5293a9, #F7D8E0);
+  --light-blue-contrast: linear-gradient(135deg, #00A8E8, #0077B6, #023E8A) ;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--light-blue);
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-container {
+  position: fixed;
+  z-index: 1;
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.7);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 0;
+}
+.modal-container.hidden {
+  z-index: -1;
+  opacity: 0;
+}
+.modal-container > .modal {
+  width: 500px;
+  height: 500px;
+  border-radius: 10px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 3px 4px rgba(0, 0, 0, 0.7);
+}
+
+.invalid {
+  font-size: 12px;
+  color: #9e2121;
+  font-weight: bold;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  background: var(--rust);
+}
+
+::-webkit-scrollbar-thumb {
+  width: 1px;
+  background: #211c1b;
+}
+
+.login-container {
+  width: 400px;
+  height: 250px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+}
+.login-container > input {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 200px;
+  border-radius: 3px;
+  padding: 10px;
+  width: 250px;
+}
+.login-container > input[type=submit] {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  width: 150px;
+}
+.login-container > input[type=submit]:hover {
+  background: #cebaba;
+}
+.login-container > input[type=submit]:active {
+  transform: translateY(2px);
+}
+.login-container > label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.main-container {
+  width: 1100px;
+  height: 800px;
+  background: #d9d9c2;
+  border-radius: 10px;
+  display: flex;
+  box-shadow: 2px 3px rgba(0, 0, 0, 0.4);
+  transition: 1s ease-out;
+  overflow: hidden;
+}
+.main-container section {
+  padding: 5px;
+}
+.main-container section.left {
+  flex: 1;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  border-right: 1px solid black;
+}
+.main-container section.left > div:first-child {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  align-items: center;
+  gap: 10px;
+  overflow-y: auto;
+  position: relative;
+}
+.main-container section.left > div:first-child h3 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px transparent solid;
+}
+.main-container section.left > div:first-child h3 span {
+  background: url("./images/three-dots.svg") no-repeat;
+  background-size: 100% 100%;
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+}
+.main-container section.left > div:first-child h3:hover {
+  border-color: black;
+}
+.main-container section.left > div:first-child input[type=search] {
+  border: 0;
+  outline: 0;
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+}
+.main-container section.left > div:first-child #message-list {
+  width: 100%;
+  border-radius: 4px;
+}
+.main-container section.left > div:first-child #message-list #unread, .main-container section.left > div:first-child #message-list #rooms, .main-container section.left > div:first-child #message-list #all-friend {
+  width: 100%;
+  height: auto;
+}
+.main-container section.left > div:first-child #message-list #unread[open] > summary:before, .main-container section.left > div:first-child #message-list #rooms[open] > summary:before, .main-container section.left > div:first-child #message-list #all-friend[open] > summary:before {
+  transform: rotate(-90deg);
+  top: calc(50% - 5px);
+}
+.main-container section.left > div:first-child #message-list #unread summary, .main-container section.left > div:first-child #message-list #rooms summary, .main-container section.left > div:first-child #message-list #all-friend summary {
+  list-style-type: none;
+  cursor: pointer;
+  font-weight: bold;
+  position: relative;
+  border-radius: 4px;
+  padding-left: 2px;
+}
+.main-container section.left > div:first-child #message-list #unread summary:hover, .main-container section.left > div:first-child #message-list #rooms summary:hover, .main-container section.left > div:first-child #message-list #all-friend summary:hover {
+  font-style: italic;
+  background: #a29e8c;
+}
+.main-container section.left > div:first-child #message-list #unread summary:before, .main-container section.left > div:first-child #message-list #rooms summary:before, .main-container section.left > div:first-child #message-list #all-friend summary:before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: url("./images/arrow.svg") no-repeat;
+  background-size: 100% 100%;
+  top: 50%;
+  left: calc(100% - 20px);
+  position: absolute;
+  transform: translateY(-50%);
+}
+.main-container section.left > div:first-child #message-list #unread > div, .main-container section.left > div:first-child #message-list #rooms > div, .main-container section.left > div:first-child #message-list #all-friend > div {
+  display: flex;
+  padding: 5px;
+  height: 60px;
+  width: 100%;
+  gap: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.main-container section.left > div:first-child #message-list #unread > div:hover, .main-container section.left > div:first-child #message-list #rooms > div:hover, .main-container section.left > div:first-child #message-list #all-friend > div:hover {
+  background: #73733d;
+}
+.main-container section.left > div:first-child #message-list #unread > div > div:first-child, .main-container section.left > div:first-child #message-list #rooms > div > div:first-child, .main-container section.left > div:first-child #message-list #all-friend > div > div:first-child {
+  height: 50px;
+  width: 60px;
+  background-color: red;
+}
+.main-container section.left > div:first-child #message-list #unread > div > div:last-child, .main-container section.left > div:first-child #message-list #rooms > div > div:last-child, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+}
+.main-container section.left > div:first-child #message-list #unread > div > div:last-child h6, .main-container section.left > div:first-child #message-list #rooms > div > div:last-child h6, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child h6 {
+  font-size: 18px;
+}
+.main-container section.left > div:first-child #message-list #unread > div > div:last-child p, .main-container section.left > div:first-child #message-list #rooms > div > div:last-child p, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child p {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 30px;
+  white-space: nowrap;
+  display: inline-block;
+  font-size: 14px;
+}
+.main-container section.left > div:last-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 0;
+  height: 50px;
+}
+.main-container section.left > div:last-child > input {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+}
+.main-container section.left > div:last-child > input:hover {
+  background: #cebaba;
+}
+.main-container section.left > div:last-child > input:active {
+  transform: translateY(2px);
+}
+.main-container section.right {
+  flex: 2;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-left: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.main-container section.right > div:first-child {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  border-bottom: 1px black solid;
+}
+.main-container section.right > div:first-child > h4 {
+  font-size: 24px;
+}
+.main-container section.right > div:first-child > span {
+  height: 30px;
+  width: 30px;
+  background: red;
+  display: inline-block;
+}
+.main-container section.right > ul {
+  height: calc(100% - 120px);
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.main-container section.right > ul > div {
+  width: 100%;
+  height: 30px;
+  background-color: transparent;
+  margin-top: auto !important;
+}
+.main-container section.right > ul > li {
+  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+.main-container section.right > ul > li.main > span {
+  display: none;
+}
+.main-container section.right > ul > li.main > div {
+  justify-content: end;
+}
+.main-container section.right > ul > li.main > div > span {
+  display: none;
+}
+.main-container section.right > ul > li > span {
+  display: block;
+  text-align: start;
+  width: 100%;
+  height: 20px;
+  font-size: 14px;
+  padding-left: 40px;
+}
+.main-container section.right > ul > li > div {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  align-items: end;
+}
+.main-container section.right > ul > li > div > span {
+  width: 35px;
+  height: 35px;
+  background-color: red;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.main-container section.right > ul > li > div > p {
+  min-height: 35px;
+  max-width: 60%;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: #d9a288;
+}
+.main-container section.right > p {
+  opacity: 0;
+  margin: 5px auto 0 auto;
+  font-size: 16px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 3px;
+  padding-left: 10px;
+  font-weight: bold;
+}
+.main-container section.right > p.show {
+  opacity: 1;
+}
+.main-container section.right > p > span {
+  position: relative;
+}
+.main-container section.right > p > span:after {
+  width: 50px;
+  height: 100%;
+  font-size: 16px;
+  display: inline-block;
+  content: "...";
+  animation: 2.5s typing infinite;
+  position: sticky;
+  bottom: 0;
+}
+.main-container section.right > div:last-child {
+  height: 70px;
+  border-bottom-right-radius: 6px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.main-container section.right > div:last-child > div:first-child {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  width: max(30px, 5%);
+  background: url("./images/happy.svg") no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+  border-radius: 60%;
+  position: relative;
+}
+.main-container section.right > div:last-child > div:first-child:hover {
+  background-color: yellow;
+}
+.main-container section.right > div:last-child > div:first-child > div {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+}
+.main-container section.right > div:last-child > textarea {
+  height: 70px;
+  width: 85%;
+  border: 1px black solid;
+  outline: none;
+  resize: none;
+  padding: 5px;
+  font-size: 16px;
+}
+.main-container section.right > div:last-child > input[type=button] {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  height: 100%;
+  width: 10%;
+  border: 1px black solid;
+}
+.main-container section.right > div:last-child > input[type=button]:hover {
+  background: #cebaba;
+}
+.main-container section.right > div:last-child > input[type=button]:active {
+  transform: translateY(2px);
+}
+@media screen and (max-width: 1200px) {
+  .main-container {
+    width: 1000px;
+  }
+}
+@media screen and (max-width: 1024px) {
+  .main-container {
+    width: 800px;
+  }
+}
+
+.connect-modal {
+  background: #995f46;
+  overflow-y: auto;
+}
+.connect-modal > h1 {
+  text-align: center;
+}
+.connect-modal > input[type=text] {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 200px;
+  border-radius: 3px;
+  padding: 10px;
+  width: 250px;
+  margin: 0 auto;
+}
+.connect-modal > section {
+  overflow-y: auto;
+  height: 100%;
+}
+.connect-modal > section > table {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+.connect-modal > section > table tbody {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100%;
+}
+.connect-modal > section > table tbody tr {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  cursor: pointer;
+}
+.connect-modal > section > table tbody tr:hover > td:nth-child(2) p {
+  scale: 1.2;
+  color: #e3d3d3;
+}
+.connect-modal > section > table tbody tr td {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 0;
+}
+.connect-modal > section > table tbody tr td:first-child {
+  border-radius: 50%;
+  border: 1px black solid;
+  width: 50px;
+  height: 50px;
+}
+.connect-modal > section > table tbody tr td:last-child {
+  width: 100px;
+  height: 50px;
+}
+.connect-modal > section > table tbody tr td:last-child > input {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  height: 50px;
+  background: linear-gradient(#68d5b5, #8ea926);
+}
+.connect-modal > section > table tbody tr td:last-child > input:hover {
+  background: #cebaba;
+}
+.connect-modal > section > table tbody tr td:last-child > input:active {
+  transform: translateY(2px);
+}
+.connect-modal > section > table tbody tr td:last-child > input:hover {
+  background: linear-gradient(#68d5b5, #8ea926);
+}
+.connect-modal > section > table tbody tr td:nth-child(2) {
+  flex: 2;
+  padding: 5px;
+}
+.connect-modal > section > table tbody tr td:nth-child(2) p {
+  font-weight: bold;
+  text-align: center;
+  width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*# sourceMappingURL=app.css.map */
