@@ -17,7 +17,7 @@ return new class extends Migration
           $table -> string('user_id');
           $table -> string('friend_id');
           $table -> string('status');
-          $table -> timestamp('created_at') -> useCurrent();
+          $table->timestamps();
 
           $table -> foreign('conversation_id') -> references('id') -> on('conversations');
           $table -> foreign('user_id') -> references('username') -> on('users');

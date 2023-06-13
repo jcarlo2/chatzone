@@ -31,8 +31,8 @@ class UserService {
         'username' => $friendUsername,
         'fullName' => $friendEntity -> firstName . ' ' . $friendEntity -> lastName,
         'status' => $friend->status,
-        'lastMessage' => $lastMessage ? $lastMessage -> message : '',
-        'isLastSender' => !$lastMessage || Auth::user() -> username === $lastMessage -> username,
+        'lastMessage' => $lastMessage !== null ? $lastMessage -> message : '',
+        'isLastSender' => $lastMessage === null ? false : Auth::user() -> username === $lastMessage -> username,
         'type' => $conversation -> type
       ];
     }
@@ -42,6 +42,7 @@ class UserService {
   public function findAllGroups($username): array {
     $groups = Participants::query()
       -> where('username', $username)
+      -> orderBy('updated_at')
       -> get();
     $list = array();
     foreach($groups as $group) {
@@ -55,9 +56,9 @@ class UserService {
 
       $list[] = [
         'conversationId' => $group -> conversation_id,
-        'lastMessage' => $lastMessage -> message,
+        'lastMessage' => $lastMessage === null ? '' : $lastMessage -> message,
         'messageType' => $group -> type,
-        'isLastSender' => !$lastMessage || Auth::user() -> username === $lastMessage -> username,
+        'isLastSender' => $lastMessage === null ? false : Auth::user() -> username === $lastMessage -> username,
         'type' => $conversation -> type,
         'fullName' => $conversation -> name
       ];
@@ -181,5 +182,29 @@ class UserService {
     $self -> update(['status' => $updateStatus]);
     $stranger -> update(['status' => $updateStatus]);
     return ['status' => $updateStatus === '' ? 'Add' : 'Friend', 'friendId' => $friendId];
+  }
+
+  public function createGroup() {
+    $conversation = new Conversation();
+    $conversation -> type = 1;
+    $conversation -> name = request('name');
+    $conversation -> save();
+
+    $members = request('members');
+    $this -> createParticipant(Auth::user() -> username, $conversation -> id);
+    foreach(json_decode($members) as $member) {
+      $this -> createParticipant($member -> username, $conversation -> id);
+    }
+
+    return redirect() -> to('main');
+  }
+
+  function createParticipant($username, $conversationId) {
+    $participants = new Participants();
+    $participants -> conversation_id = $conversationId;
+    $participants -> username = $username;
+    $participants -> last_read_message = '';
+    $participants -> sender = '';
+    $participants -> save();
   }
 }

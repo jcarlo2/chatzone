@@ -16,10 +16,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('conversation_id');
             $table->string('username');
-            $table->text('last_read_message') -> default('');
+            $table->string('sender');
+            $table->text('last_read_message') -> nullable(true);
             $table->tinyInteger('type') -> default(0);
-            $table->timestamp('created_at')->useCurrent();
-
+            $table->timestamps();
             $table -> foreign('conversation_id') -> references('id') -> on('conversations');
         });
     }

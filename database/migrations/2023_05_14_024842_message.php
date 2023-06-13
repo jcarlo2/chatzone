@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('conversation_id');
             $table->string('username');
             $table->text('message');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table -> foreign('conversation_id') -> references('id') -> on('conversations');
         });

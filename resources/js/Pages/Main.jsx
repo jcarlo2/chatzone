@@ -5,6 +5,7 @@ import Pusher from 'pusher-js'
 import {useForm, usePage} from "@inertiajs/react";
 import MainLayout from "./Layout/MainLayout.jsx";
 import ConnectModal from "../components/ConnectModal.jsx";
+import NewRoomModal from "../components/NewRoomModal.jsx";
 import GlobalContext from "../context/GlobalContext.jsx";
 
 const Main = ()=> {
@@ -28,6 +29,7 @@ const Main = ()=> {
   const messageList = useRef()
   const float = useRef()
   const connectModal = useRef()
+  const newGroupModal = useRef()
   const searchList = useRef()
   const search = useRef()
   const {data, setData, processing} = useForm({
@@ -92,10 +94,6 @@ const Main = ()=> {
     const str = search.current.value.toLowerCase()
     const list = str.trim() === '' ? [] : [...friendList, ...groupList]
       .filter(item => item.fullName.toLowerCase().includes(str))
-      .map(item => ({
-        conversationId: item.conversationId,
-        fullName: item.fullName,
-      }))
     setSearchSuggestionList(list)
   }
 
@@ -226,7 +224,6 @@ const Main = ()=> {
   }
 
   const sendMessage = ()=> {
-    console.log(data)
     if(data.message !== undefined && data.message.trim() !== '' && data.channel >= 0) {
       fetch(`${url}/event`,{
         method: 'POST',
@@ -284,9 +281,14 @@ const Main = ()=> {
       && contentList[index - 1].username === message.username;
   }
 
+  const handleCreateNewGroup = ()=> {
+    newGroupModal.current.classList.remove('hidden')
+  }
+
   return (
     <>
       <ConnectModal ref={connectModal} csrf={csrf}/>
+      <NewRoomModal ref={newGroupModal} friendList={friendList} setGroup={setGroupList}/>
       <MainLayout>
         <main className={'main-container'}>
           <section className={'left'}>
@@ -298,7 +300,10 @@ const Main = ()=> {
                   {
                     searchSuggestionList.map(item => (
                       <li key={item.conversationId} onClick={()=> {
-                        console.log('hey')
+                        setDoScroll(true)
+                        handleActiveChat(item)
+                        search.current.value = ''
+                        searchList.current.classList.remove('show')
                       }}>{item.fullName}</li>
                     ))
                   }
@@ -307,7 +312,7 @@ const Main = ()=> {
               <div id={'message-list'}>
                 <details id={'rooms'}>
                   <summary>Chat Rooms</summary>
-                  <input type='button' defaultValue={'Create New Group'}/>
+                  <input type='button' defaultValue={'Create New Room'} onClick={handleCreateNewGroup}/>
                   {
                     groupList.map(group => (
                       <div key={group.conversationId} onClick={()=> handleActiveChat(group)}>

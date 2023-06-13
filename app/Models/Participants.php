@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Participants extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'conversation_id',
+        'username',
+        'last_read_message',
+        'sender',
+    ];
 }

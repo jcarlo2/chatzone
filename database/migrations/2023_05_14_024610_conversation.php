@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table -> tinyInteger('type') -> default(0);
             $table->string('name') -> default('New Group');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
         });
     }
 

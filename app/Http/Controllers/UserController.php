@@ -80,4 +80,8 @@ class UserController extends Controller
   public function updateFriendStatus() {
     return $this -> userService -> updateFriendStatus();
   }
+
+  public function createGroup() {
+    return $this -> userService -> createGroup();
+  }
 }

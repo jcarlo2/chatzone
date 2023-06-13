@@ -198,9 +198,10 @@
           font-size: 24px;
         }
         > span {
+          // FOR ACTIVE CHAT OPTION
           height: 30px;
           width: 30px;
-          background: red;
+          background: transparent; 
           display: inline-block;
         }
       }
@@ -277,7 +278,6 @@
         align-items: center;
         justify-content: center;
         gap: 5px;
-        //background: linear-gradient(to top, #979090, #c5afaf);
         border-radius: 3px;
         padding-left: 10px;
         font-weight: bold;

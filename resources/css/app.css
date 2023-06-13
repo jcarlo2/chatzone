@@ -63,6 +63,7 @@ ul {
   opacity: 0;
 }
 .modal-container > .modal {
+  background: #995f46;
   width: 500px;
   height: 500px;
   border-radius: 10px;
@@ -387,7 +388,7 @@ ul {
 .main-container section.right > div:first-child > span {
   height: 30px;
   width: 30px;
-  background: red;
+  background: transparent;
   display: inline-block;
 }
 .main-container section.right > ul {
@@ -546,7 +547,6 @@ ul {
 }
 
 .connect-modal {
-  background: #995f46;
   overflow-y: auto;
 }
 .connect-modal > h1 {
@@ -643,6 +643,159 @@ ul {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.group-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.group-modal > form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.group-modal > form hr {
+  width: 100%;
+  background-color: rgb(45, 43, 43);
+  border: none;
+  height: 2px;
+}
+.group-modal > form > input[type=text] {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 200px;
+  border-radius: 3px;
+  padding: 10px;
+}
+.group-modal > form > div:nth-child(3) {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.group-modal > form > div:nth-child(3) > div {
+  position: relative;
+}
+.group-modal > form > div:nth-child(3) > div ul {
+  display: none;
+  position: absolute;
+  top: calc(100% + 5px);
+  background-color: beige;
+  width: 100%;
+  max-height: 250px;
+  overflow: auto;
+  flex-direction: column;
+  gap: 5px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.group-modal > form > div:nth-child(3) > div ul.show {
+  display: flex;
+}
+.group-modal > form > div:nth-child(3) > div ul li {
+  text-align: center;
+  font-weight: bold;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 5;
+}
+.group-modal > form > div:nth-child(3) input {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 200px;
+  border-radius: 3px;
+  padding: 10px;
+}
+.group-modal > form > div:nth-child(3) input[type=button], .group-modal > form > div:nth-child(3) input[type=submit] {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  width: 100px;
+}
+.group-modal > form > div:nth-child(3) input[type=button]:hover, .group-modal > form > div:nth-child(3) input[type=submit]:hover {
+  background: #cebaba;
+}
+.group-modal > form > div:nth-child(3) input[type=button]:active, .group-modal > form > div:nth-child(3) input[type=submit]:active {
+  transform: translateY(2px);
+}
+.group-modal > form > div:nth-child(4) {
+  border-radius: 10px;
+  height: 260px;
+  overflow-y: auto;
+}
+.group-modal > form > div:nth-child(4) > table {
+  height: 100%;
+  border-collapse: collapse;
+  border-radius: inherit;
+  padding: 50px;
+  overflow: hidden;
+}
+.group-modal > form > div:nth-child(4) > table tbody {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+.group-modal > form > div:nth-child(4) > table tbody tr {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  height: 50px;
+}
+.group-modal > form > div:nth-child(4) > table tbody tr:hover {
+  scale: 1.2;
+  font-weight: bold;
+}
+.group-modal > form > div:nth-child(4) > table tbody tr:nth-child(odd) {
+  background-color: rgb(139, 139, 201);
+}
+.group-modal > form > div:nth-child(4) > table tbody tr:nth-child(even) {
+  background-color: rgb(200, 200, 178);
+}
+.group-modal > form > div:nth-child(4) > table tbody tr:first-child {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.group-modal > form > div:nth-child(4) > table tbody tr:last-child {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.group-modal > form > div:nth-child(4) > table tbody tr td {
+  height: 50px;
+}
+.group-modal > form > div:nth-child(4) > table tbody tr td:first-child {
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 440px;
+  padding: 15px 20px;
+}
+.group-modal > form > input[type=submit] {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+}
+.group-modal > form > input[type=submit]:hover {
+  background: #cebaba;
+}
+.group-modal > form > input[type=submit]:active {
+  transform: translateY(2px);
 }
 
 #registerContainer {

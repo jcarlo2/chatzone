@@ -21,6 +21,7 @@ Route::controller(UserController::class) -> group(function() {
   Route::get('/logout','logout') -> middleware('auth') -> name('logout');
   Route::post('/user/search','search') -> middleware('auth');
   Route::post('/user/update-friend-status','updateFriendStatus') -> middleware('auth');
+  Route::post('/user/create-group','createGroup') -> middleware('auth');
 });
 
 Route::post('/event',function() {
