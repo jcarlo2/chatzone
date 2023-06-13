@@ -63,7 +63,7 @@ class UserService {
         'fullName' => $conversation -> name
       ];
     }
-    return $list;
+    return $list;`
   }
 
   public function findAllMessages(): array {
