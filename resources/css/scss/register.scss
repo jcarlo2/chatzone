@@ -1,0 +1,59 @@
+#registerContainer {
+  display: flex;
+  flex-direction: column;
+  p {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+    > a {
+      color: blue;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+      &:hover {
+        color: #1414ae;
+      }
+    }
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    input {
+      height: 30px;
+      width: 200px;
+      border: 0;
+      outline: none;
+      border-radius: 2px;
+      padding: 0 10px;
+      &[type=submit] {
+        background-color: #cae04e;
+        width: 150px;
+        border-radius: 6px;
+        font-weight: bold;
+        border: 0 !important;
+        cursor: pointer;
+        transition: 0.3s linear;
+        &:active {
+          transform: translateY(-2px);
+        }
+      }
+      //&:invalid, &.invalid {
+      //  border: 3px solid red !important;
+      //}
+    }
+    > fieldset {
+      height: 50px;
+      padding: 0 5px;
+      width: 200px;
+      > legend {
+        font-weight: bold;
+        padding: 0 5px;
+      }
+      > input {
+        width: 100%;
+      }
+    }
+  }
+}

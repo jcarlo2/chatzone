@@ -1,43 +1,66 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
 import Echo from "laravel-echo"
 import Pusher from 'pusher-js'
 import {useForm, usePage} from "@inertiajs/react";
 import MainLayout from "./Layout/MainLayout.jsx";
 import ConnectModal from "../components/ConnectModal.jsx";
+import GlobalContext from "../context/GlobalContext.jsx";
 
 const Main = ()=> {
+  const url = useContext(GlobalContext).url
   const csrf = usePage().props.csrf
   const {id, username, firstName, lastName} = usePage().props.user
   const [friendList, setFriendList] = useState(usePage().props.friends)
-  const [activeFriend, setActiveFriend] = useState({
+  const [groupList, setGroupList] = useState(usePage().props.groups)
+  const [activeChat, setActiveChat] = useState({
     fullName: '',
     username: '',
     conversationId: '',
     type: ''
   })
+  const [searchSuggestionList, setSearchSuggestionList] = useState([])
   const [contentList, setContentList] = useState([])
   const [messageLoadURL, setMessageLoadURL] = useState(null)
+  const [doScroll, setDoScroll] = useState(false)
   const emoji = useRef()
   const messageBox = useRef()
   const messageList = useRef()
   const float = useRef()
   const connectModal = useRef()
-  const {data, setData, post, processing} = useForm({
+  const searchList = useRef()
+  const search = useRef()
+  const {data, setData, processing} = useForm({
     message: '',
-    channel: -99
+    channel: -99,
+    username: ''
   })
-  const [doScroll, setDoScroll] = useState(false)
+
+  useEffect(()=> {handleSearchSuggestion()},[friendList, groupList])
+
+  useEffect(()=> {
+    if(searchSuggestionList.length > 0) searchList.current.classList.add('show')
+    else searchList.current.classList.remove('show')
+  }, [searchSuggestionList])
 
   useEffect(()=> {
     findAllMessages()
-    setData('channel', activeFriend.conversationId)
-  },[activeFriend])
+    setData(previousData => ({
+     ...previousData,
+        'username': activeChat.username,
+        'channel': activeChat.conversationId
+    }))
+  },[activeChat])
 
   useEffect(()=> {
-    if(doScroll) messageList.current.scrollTop = messageList.current.scrollHeight
-    setDoScroll(false)
+    if(doScroll || messageList.current.scrollTop === messageList.current.scrollHeight) {
+      setDoScroll(false)
+      messageList.current.scrollTop = messageList.current.scrollHeight
+      return
+    } 
+    messageList.current.scrollTop = 200
   }, [contentList])
+
 
   useEffect(()=> {
     const echo = new Echo({
@@ -51,54 +74,101 @@ const Main = ()=> {
       disableStats: true, // optional, to disable stats
     })
 
-    echo.connector.pusher.connection.bind('connected', (e) => {
+    echo.connector.pusher.connection.bind('connected', () => {
       console.log('WebSocket connection established');
-      friendList.forEach(friend => {
-        const channel = echo.join(`presence.play.${friend.conversationId}`)
-          .here((event)=> {
-            messageBox.current.addEventListener('focus',()=> {
-              if(activeFriend.conversationId !== friend.conversationId) return
-              channel.whisper('typing',{
-                fullName: username,
-                isGroup: 'false'
-              })
-            })
-            messageBox.current.addEventListener('blur',()=> {
-              channel.whisper('stop-typing',{})
-            })
-          })
-          .listen('.play-event',(event)=> {
-            handleChangeLastMessages(event)
-            if(activeFriend.conversationId !== event.channel) return
-            messageBox.current.value = ''
-            handleContentList(event)
-            // make a dialog for new message, when clicked, scroll to bottom
-            // messageList.current.scrollTop = messageList.current.scrollHeight;
-          })
-          .listenForWhisper('typing',(e)=> float.current.classList.add('show'))
-          .listenForWhisper('stop-typing',(e)=> float.current.classList.remove('show'))
-      })
+      friendList.forEach(friend => handleMakingChannel(friend,echo,'friend'))
+      groupList.forEach(group => handleMakingChannel(group, echo,'group'))
     });
 
     return ()=> {
       friendList.forEach(friend => {
-        echo.channel(friend.conversationId).unsubscribe()
+        echo.channel(friend.conversationId.toString()).unsubscribe()
       })
       echo.disconnect()
     }
-  },[friendList.length, activeFriend])
+  },[friendList.length, activeChat])
 
-  const handleChangeLastMessages = (event)=> {
-    setFriendList(prevState => prevState.map(friend => {
-      if (friend.conversationId === event.channel) {
-        return {
-          ...friend,
-          lastMessage: event.content,
-          isLastSender: friend.username === event.sender
+  const handleSearchSuggestion = ()=> {
+    const str = search.current.value.toLowerCase()
+    const list = str.trim() === '' ? [] : [...friendList, ...groupList]
+      .filter(item => item.fullName.toLowerCase().includes(str))
+      .map(item => ({
+        conversationId: item.conversationId,
+        fullName: item.fullName,
+      }))
+    setSearchSuggestionList(list)
+  }
+
+  const handleMakingChannel = (entity, echo, type)=> {
+    const channel = echo.join(`presence.play.${entity.conversationId}`)
+      .here((event)=> handleUserTyping(channel, entity.conversationId))
+      .listen('.play-event',(event)=> {
+        setDoScroll(true)
+        handleListenEvent(event, type)
+        // make a dialog for new message, when clicked, scroll to bottom
+        // messageList.current.scrollTop = messageList.current.scrollHeight;
+      })
+      .listenForWhisper('typing',()=> {
+        if(entity.conversationId === activeChat.conversationId) {
+          float.current.classList.add('show')
         }
-      }
-      return friend
+      })
+      .listenForWhisper('stop-typing',()=> {
+        if(entity.conversationId === activeChat.conversationId) {
+          float.current.classList.remove('show')
+        }
+      })
+  }
+
+  const handleListenEvent = (event,type)=> {
+    handleChangeLastMessages(event,type)
+    if(activeChat.conversationId !== event.channel) return
+    messageBox.current.value = ''
+    setData(previousData => ({
+      ...previousData,
+      message: ''
     }))
+    handleContentList(event)
+  }
+
+  const handleUserTyping = (channel,conversationId)=> {
+    messageBox.current.addEventListener('focus',()=> {
+      if(activeChat.conversationId !== conversationId) return
+      channel.whisper('typing',{
+        fullName: username,
+        isGroup: 'false'
+      })
+    })
+    messageBox.current.addEventListener('blur',()=> {
+      channel.whisper('stop-typing',{})
+    })
+  }
+
+  const handleChangeLastMessages = (event, type)=> {
+    if(type === 'friend') {
+      setFriendList(prevState => prevState.map(friend => {
+        if (friend.conversationId === event.channel) {
+          return {
+            ...friend,
+            lastMessage: event.content,
+            isLastSender: username === event.sender
+          }
+        }
+        return friend
+      }))
+    }else {
+      setGroupList(prevState => prevState.map(group => {
+        if(group.conversationId === event.channel) {
+          console.log(group)
+          return {
+            ...group,
+            lastMessage: event.content,
+            isLastSender: username === event.sender
+          }
+        }
+        return group
+      }))
+    }
   }
 
   const handleContentList = ({content, sender, initial, fullName, id})=> {
@@ -112,22 +182,22 @@ const Main = ()=> {
   }
 
   const findAllMessages = () => {
-    fetch('http://localhost:8000/api/user/find-all-messages', {
+    fetch(`${url}/api/user/find-all-messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        conversationId: activeFriend.conversationId
+        conversationId: activeChat.conversationId
       })
     }).then(res => {
-        if(res.ok) {
-          res.json().then(({url,list}) => {
-            setContentList(list)
-            setMessageLoadURL(url.next_page_url)
-          })
-        }
-      }).catch(console.log)
+      if(res.ok) {
+        res.json().then(({url,list}) => {
+          setContentList(list)
+          setMessageLoadURL(url.next_page_url)
+        })
+      }
+    }).catch(console.log)
   }
 
   const handleMessageListScroll = (e)=> {
@@ -139,7 +209,7 @@ const Main = ()=> {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          conversationId: activeFriend.conversationId
+          conversationId: activeChat.conversationId
         })
       }).then(res => {
         if(res.ok) {
@@ -156,7 +226,27 @@ const Main = ()=> {
   }
 
   const sendMessage = ()=> {
-    if(data.message !== '' && data.channel >= 0) post('/event')
+    console.log(data)
+    if(data.message !== undefined && data.message.trim() !== '' && data.channel >= 0) {
+      fetch(`${url}/event`,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrf
+        },
+        body: JSON.stringify(data)
+      }).then(res => {
+          if(res.ok) {
+            res.json().then(({response, friendUsername}) => {
+              if(response === 'Unauthorized') {
+                // go to login page
+              }else if(response === '') {
+                // remove friend
+              }
+            })
+          }
+        }).catch(console.log)
+    }
   }
 
   const handleEmojiContainer = ()=> {
@@ -167,21 +257,22 @@ const Main = ()=> {
 
   const handleEmojiPicker = (emojiObject)=> {
     messageBox.current.value = messageBox.current.value + emojiObject.emoji
+    setData('message', data.message + emojiObject.emoji)
   }
 
-  const handleActiveFriend = (friend)=> {
+  const handleActiveChat = (chat)=> {
     setDoScroll(true)
     if(
-      activeFriend.fullName !== friend.fullName
-      || activeFriend.username !== friend.username
-      || activeFriend.conversationId !== friend.conversationId
-      || activeFriend.type !== friend.type
+      activeChat.fullName !== chat.fullName
+      || activeChat.username !== chat.username
+      || activeChat.conversationId !== chat.conversationId
+      || activeChat.type !== chat.type
     ) {
-      setActiveFriend({
-        'fullName': friend.fullName,
-        'username': friend.username,
-        'conversationId': friend.conversationId,
-        'type': friend.type
+      setActiveChat({
+        'fullName': chat.fullName,
+        'username': chat.username,
+        'conversationId': chat.conversationId,
+        'type': chat.type
       })
     }
   }
@@ -201,96 +292,46 @@ const Main = ()=> {
           <section className={'left'}>
             <div>
               <h3>{firstName} {lastName}<span></span></h3>
-              <input type="search" placeholder={'Search a friend...'}/>
+              <div className={'search'}>
+                <input ref={search} type="search" placeholder={'Search a friend...'} onChange={handleSearchSuggestion} />
+                <ul ref={searchList} className={'search-list'}>
+                  {
+                    searchSuggestionList.map(item => (
+                      <li key={item.conversationId} onClick={()=> {
+                        console.log('hey')
+                      }}>{item.fullName}</li>
+                    ))
+                  }
+                </ul>
+              </div>
               <div id={'message-list'}>
-                <details id={'unread'}>
-                  <summary>Unread</summary>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                </details>
                 <details id={'rooms'}>
                   <summary>Chat Rooms</summary>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div></div>
-                    <div>
-                      <h6>Joaquin Bordado</h6>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim, et fuga in itaque iusto! Aliquam earum, est, excepturi incidunt iusto laudantium magnam maxime nesciunt, quae repellendus sint sit voluptatibus.
-                      </p>
-                    </div>
-                  </div>
+                  <input type='button' defaultValue={'Create New Group'}/>
+                  {
+                    groupList.map(group => (
+                      <div key={group.conversationId} onClick={()=> handleActiveChat(group)}>
+                        <div></div>
+                        <div>
+                          <h6>{group.fullName}</h6>
+                          <p>
+                            {group.isLastSender ? 'You: ' : ''} {group.lastMessage}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  }
                 </details>
                 <details id={'all-friend'}>
                   <summary>All Friend</summary>
                   {
                     friendList.map(friend => (
-                      <div key={friend.conversationId} onClick={()=> handleActiveFriend(friend)}>
+                      <div key={friend.conversationId} onClick={()=> handleActiveChat(friend)}>
                         <div></div>
                         <div>
                           <h6>{friend.fullName}</h6>
                           <p>
-                            {friend.isLastSender ? '' : 'You: '} {friend.lastMessage}
+                            {friend.isLastSender ? 'You: ' : ''} {friend.lastMessage}
                           </p>
                         </div>
                       </div>
@@ -303,20 +344,19 @@ const Main = ()=> {
               <input type="button" className={'btn'} defaultValue={'Connect with Others'} onClick={(e)=> {
                 e.preventDefault()
                 connectModal.current.classList.remove('hidden')
-                console.log(connectModal)
               }}/>
             </div>
           </section>
           <section className={'right'}>
             <div>
-              <h4>{activeFriend.fullName}</h4>
+              <h4>{activeChat.fullName}</h4>
               <span></span>
             </div>
             <ul ref={messageList} onScroll={handleMessageListScroll}>
               <div></div>
               {
                 contentList.map(message => (
-                  <li key={message.id} id={message.id} className={(username === message.username ? 'main ' : '') + message.username}>
+                  <li key={message.id} id={`message${message.id}`} className={(username === message.username ? 'main ' : '') + message.username}>
                     <span style={{ display: handleHide(message) ? 'none' : '' }}>{message.fullName}</span>
                     <div>
                     <span

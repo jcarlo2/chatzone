@@ -1,17 +1,30 @@
 .login-container {
-  width: 400px;
-  height: 250px;
-  border-radius: 10px;
   @include flexCenter(column, 5px);
-  > input {
-    @include defaultInput;
-    width: 250px;
-    &[type=submit] {
-      @include defaultBtn;
-      width: 150px;
+  form {
+    width: 400px;
+    height: 150px;
+    border-radius: 10px;
+    @include flexCenter(column, 5px);
+    > input {
+      @include defaultInput;
+      width: 250px;
+      &[type=submit] {
+        @include defaultBtn;
+        width: 150px;
+      }
+    }
+    > label {
+      @include flexCenter(row, 5px);
     }
   }
-  > label {
-    @include flexCenter(row, 5px);
-  }
+   > p, a {
+     > a, &:nth-child(3) {
+       cursor: pointer;
+       color: blue;
+       font-weight: bold;
+       &:hover {
+         color: #1414ae;
+       }
+     }
+   }
 }

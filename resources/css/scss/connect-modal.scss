@@ -43,11 +43,15 @@
                 height: 50px;
               }
               &:last-child {
+                flex: 1;
                 width: 100px;
                 height: 50px;
+                display: flex;
+                gap: 5px;
                 > input {
                   @include defaultBtn;
                   height: 50px;
+                  padding: 5px;
                   background: linear-gradient(#68d5b5, #8ea926);
                   &:hover {
                     background: linear-gradient(#68d5b5, #8ea926);
@@ -60,7 +64,7 @@
                 p {
                   font-weight: bold;
                   text-align: center;
-                  width: 300px;
+                  width: 250px;
                   overflow: hidden;
                   text-overflow: ellipsis;
                   white-space: nowrap;

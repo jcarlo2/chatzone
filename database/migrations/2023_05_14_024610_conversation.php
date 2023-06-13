@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('conversations', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->id();
             $table -> tinyInteger('type') -> default(0);
             $table->string('name') -> default('New Group');
             $table->timestamp('created_at')->useCurrent();

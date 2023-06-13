@@ -14,6 +14,14 @@ body {
   background: var(--light-blue);
 }
 
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
 #app {
   min-height: 100vh;
   @include flexCenter(column, 10px);
@@ -48,6 +56,8 @@ body {
   color: #9e2121;
   font-weight: bold;
 }
+
+
 
 ::-webkit-scrollbar {
   width: 3px;

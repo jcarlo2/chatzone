@@ -1,6 +1,8 @@
-import React, {forwardRef, useRef, useState} from "react";
+import React, {forwardRef, useContext, useRef, useState} from "react";
+import GlobalContext from "../context/GlobalContext.jsx";
 
 const ConnectModal = forwardRef(({csrf},ref)=> {
+  const url = useContext(GlobalContext).url
   const searchInput = useRef()
   const discover = useRef()
   const [searchList, setSearchList] = useState([])
@@ -8,7 +10,7 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
   const handleSearch = (e)=> {
     const search = e.currentTarget.value
     if(search.trim() === '') return
-    fetch(`http://localhost:8000/user/search`,{
+    fetch(`${url}/user/search`,{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,7 +27,7 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
 
   const handleStrangerStatus = (e, id)=> {
     const status = e.currentTarget.value
-    fetch(`http://localhost:8000/user/update-friend-status`,{
+    fetch(`${url}/user/update-friend-status`,{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,15 +73,21 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
                       <p>{stranger.fullName}</p>
                     </td>
                     <td>
-                      <input type="button"
-                             defaultValue={
-                                stranger.status === 'PENDING REQUEST'
-                               ? 'PENDING'
-                               : stranger.status === 'PENDING APPROVED'
-                               ? 'APPROVE?'
-                                  : stranger.status
-                            }
-                             onClick={(e)=> handleStrangerStatus(e, stranger.id)}/>
+                      <input type="button" defaultValue={
+                        stranger.status === 'Pending Request'
+                          ? 'Pending'
+                          : stranger.status === 'Pending Approved'
+                          ? 'Accept'
+                          : stranger.status === 'Friend'
+                          ? 'Unfriend'
+                          : stranger.status
+                      } onClick={(e)=> handleStrangerStatus(e, stranger.id)}/>
+                      <input type="button" defaultValue={
+                        stranger.status === 'Pending Approved'
+                          ? 'Decline'
+                          : 'Block'
+                      }
+                       onClick={(e)=> handleStrangerStatus(e, stranger.id)}/>
                     </td>
                   </tr>
                 ))

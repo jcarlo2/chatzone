@@ -4,6 +4,7 @@ namespace App\Http\Service;
 use App\Models\Conversation;
 use App\Models\Friendship;
 use App\Models\Message;
+use App\Models\Participants;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,8 +15,6 @@ class UserService {
       ->where('status', 'FRIEND')
       -> get();
     $friendList = array();
-    $increment = 0;
-
     foreach ($friends as $friend) {
       $friendUsername = $username === $friend -> user_id
         ? $friend -> friend_id
@@ -27,18 +26,43 @@ class UserService {
         -> orderBy('created_at', 'desc')
         -> first();
 
-      $friendList[$increment] = [
+      $friendList[] = [
         'conversationId' => $friend->conversation_id,
         'username' => $friendUsername,
         'fullName' => $friendEntity -> firstName . ' ' . $friendEntity -> lastName,
         'status' => $friend->status,
         'lastMessage' => $lastMessage ? $lastMessage -> message : '',
-        'isLastSender' => !$lastMessage || $friendUsername === $lastMessage->username,
+        'isLastSender' => !$lastMessage || Auth::user() -> username === $lastMessage -> username,
         'type' => $conversation -> type
       ];
-      $increment++;
     }
     return $friendList;
+  }
+
+  public function findAllGroups($username): array {
+    $groups = Participants::query()
+      -> where('username', $username)
+      -> get();
+    $list = array();
+    foreach($groups as $group) {
+      $conversation = Conversation::query()
+        -> where('id', $group -> conversation_id)
+        -> first();
+      $lastMessage = Message::query()
+        -> where('conversation_id', $group -> conversation_id)
+        -> orderBy('created_at', 'desc')
+        -> first();
+
+      $list[] = [
+        'conversationId' => $group -> conversation_id,
+        'lastMessage' => $lastMessage -> message,
+        'messageType' => $group -> type,
+        'isLastSender' => !$lastMessage || Auth::user() -> username === $lastMessage -> username,
+        'type' => $conversation -> type,
+        'fullName' => $conversation -> name
+      ];
+    }
+    return $list;
   }
 
   public function findAllMessages(): array {
@@ -85,21 +109,30 @@ class UserService {
         -> where('user_id', $username)
         -> where('friend_id', $user -> username)
         -> first();
-      $list[] = [
-        'id' => $user -> id,
-        'fullName' => "{$user -> firstName} {$user -> lastName}",
-        'initial' => substr($user -> firstName, 0, 1) . substr($user -> lastName, 0, 1),
-        'status' => !$friend || trim($friend -> status) === '' ? 'ADD' : $friend -> status,
-      ];
+      if(!$friend) {
+        $list[] = [
+          'id' => $user -> id,
+          'fullName' => "{$user -> firstName} {$user -> lastName}",
+          'initial' => substr($user -> firstName, 0, 1) . substr($user -> lastName, 0, 1),
+          'status' => 'Add'
+        ];
+      }
+      else if($friend -> status !== 'Blocked 0' && $friend -> status !== 'Blocked 1') {
+        $list[] = [
+          'id' => $user -> id,
+          'fullName' => "{$user -> firstName} {$user -> lastName}",
+          'initial' => substr($user -> firstName, 0, 1) . substr($user -> lastName, 0, 1),
+          'status' => trim($friend -> status) === '' ? 'Add' : $friend -> status,
+        ];
+      }
     }
+
     return $list;
   }
 
   function updateFriendStatus(): array {
-    // WEBSOCKET TO ENSURE REAL TIME UPDATE
     $status = request('status');
     $friendId = request('id');
-    if($status === 'FRIEND') return ['status' => 'FRIEND'];
 
     $user = User::query() -> where('id',$friendId) -> first();
 
@@ -107,40 +140,46 @@ class UserService {
       -> where('user_id', Auth::user() -> username)
       -> where('friend_id', $user -> username)
       -> first();
-    error_log($self);
-    error_log(Auth::id());
-    error_log($friendId);
 
     $stranger = Friendship::query()
       -> where('user_id', $user -> username)
       -> where('friend_id', Auth::user() -> username)
       -> first();
 
-    if(!$self) {
-      $conversation = new Conversation();
-      $conversation -> type = 0;
-      $conversation -> save();
-      Friendship::query() -> create([
-        'conversation_id' => $conversation -> id,
-        'user_id' => Auth::user() -> username,
-        'friend_id' => $user -> username,
-        'status' => 'PENDING REQUEST'
-      ]);
-      Friendship::query() -> create([
-        'conversation_id' => $conversation -> id,
-        'user_id' => $user -> username,
-        'friend_id' => Auth::user() -> username,
-        'status' => 'PENDING APPROVED'
-      ]);
-      return ['status' => 'PENDING REQUEST'];
-    }else if($status === 'PENDING' || $status === 'APPROVED?') {
-      $self -> update(['status' => '', 'friendId' => $friendId]);
-      $stranger -> update(['status' => '']);
-      return ['status' => 'ADD', 'friendId' => $friendId];
-    }
-    $self -> update(['status' => 'PENDING REQUEST']);
-    $stranger -> update(['status' => 'PENDING APPROVED']);
+    $updateStatus = '';
 
-    return ['status' => 'PENDING REQUEST', 'friendId' => $friendId];
+    if(!$self && $status === 'Add') {
+      $conversation = new Conversation();
+      $conversation-> type = 0;
+      $conversation->save();
+      Friendship::query()->create([
+        'conversation_id' => $conversation->id,
+        'user_id' => Auth::user()->username,
+        'friend_id' => $user->username,
+        'status' => 'Pending Request'
+      ]);
+      Friendship::query()->create([
+        'conversation_id' => $conversation->id,
+        'user_id' => $user->username,
+        'friend_id' => Auth::user()->username,
+        'status' => 'Pending Approved'
+      ]);
+      return ['status' => 'Pending', 'friendId' => $friendId];
+    }
+    else if($status === 'Add') {
+      $self -> update(['status' => 'Pending Request']);
+      $stranger -> update(['status' => 'Pending Approved']);
+      return ['status' => 'Pending', 'friendId' => $friendId];
+    }
+    else if($status === 'Block') {
+      $self -> update(['status' => 'Blocked 0']);
+      $stranger -> update(['status' => 'Blocked 1']);
+      return ['status' => 'Blocked', 'friendId' => $friendId];
+    }
+    else if($status === 'Accept') $updateStatus = 'Friend';
+
+    $self -> update(['status' => $updateStatus]);
+    $stranger -> update(['status' => $updateStatus]);
+    return ['status' => $updateStatus === '' ? 'Add' : 'Friend', 'friendId' => $friendId];
   }
 }

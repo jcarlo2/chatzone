@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table-> id();
-            $table->string('conversation_id');
+            $table->unsignedBigInteger('conversation_id');
             $table->string('username');
             $table->text('message');
             $table->timestamp('created_at')->useCurrent();

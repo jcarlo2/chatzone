@@ -43,22 +43,57 @@
             border-color: black;
           }
         }
-        input[type=search] {
-          border: 0;
-          outline: 0;
-          padding: 10px;
-          border-radius: 4px;
+        div.search {
           width: 100%;
-          position: sticky;
-          top: 0;
+          height: 30px;
+          position: relative;
+          input[type=search] {
+            border: 0;
+            outline: 0;
+            padding: 10px;
+            border-radius: 4px;
+            width: 100%;
+            position: sticky;
+            top: 0;
+          }
+          ul {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            width: 100%;
+            background: beige;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 5;
+            max-height: 300px;
+            overflow-y: auto;
+            &.show {
+              display: block;
+            }
+            li {
+              text-align: center;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              width: calc(100% + 0px);
+              padding: 0 10px;
+              margin-bottom: 5px;
+              font-weight: bold;
+              cursor: pointer;
+              &:hover {
+                background: #caca7a;
+              }
+            }
+          }
         }
         #message-list {
           width: 100%;
           border-radius: 4px;
-          #unread, #rooms, #all-friend {
+          #rooms, #all-friend {
             width: calc(100%);
             height: auto;
             &[open] > summary:before {
+              transition: 0.3s linear;
               transform: rotate(-90deg);
               top: calc(50% - 5px)
             }
@@ -119,6 +154,18 @@
                   display:inline-block;
                   font-size: 14px;
                 }
+              }
+            }
+          }
+          #rooms {
+            display: flex;
+            flex-direction: column;
+            > input[type=button] {
+              @include defaultBtn;
+              margin: 10px auto;
+              background-color: #829cd0;
+              &:hover {
+                background-color: #677ba3;
               }
             }
           }
@@ -204,7 +251,7 @@
             > span {
               width: 35px;
               height: 35px;
-              background-color: red;
+              background-color: rgb(185, 185, 170);
               border-radius: 50%;
               display: flex;
               align-items: center;

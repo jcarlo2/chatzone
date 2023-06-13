@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Message;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -17,10 +18,27 @@ class UserController extends Controller
   }
 
   public function create(): Response {
+    return Inertia::render('Register');
+  }
+
+  public function store(RegisterRequest $request): RedirectResponse {
+    $user = new User();
+    $user -> username = $request -> username;
+    $user -> password = bcrypt($request -> password);
+    $user -> email = $request -> email;
+    $user -> firstName = $request -> firstName;
+    $user -> lastName = $request -> lastName;
+    $user -> gender = $request -> gender;
+    $user -> birthdate = $request -> birthdate;
+    $user -> save();
+    return redirect() -> intended('/login');
+  }
+
+  public function login(): Response {
     return Inertia::render('Login');
   }
 
-  public function store(): RedirectResponse {
+  public function verify(): RedirectResponse {
     $credentials = request()->validate([
       'username' => ['required'],
       'password' => ['required', 'min:8'],
@@ -40,7 +58,8 @@ class UserController extends Controller
     $user = Auth::user();
     return Inertia::render('Main',[
       'user' => $user,
-      'friends' => $this-> userService -> findAllFriends($user -> username),
+      'friends' => $this -> userService -> findAllFriends($user -> username),
+      'groups' => $this -> userService -> findAllGroups($user -> username),
       'csrf' => csrf_token()
     ]);
   }

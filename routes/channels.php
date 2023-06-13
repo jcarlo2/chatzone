@@ -2,6 +2,7 @@
 
 use App\Models\Friendship;
 use App\Models\Participants;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
 
 //Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
@@ -14,9 +15,12 @@ Broadcast::channel('private.play.{id}', function ($user, $id) {
 
 Broadcast::channel('presence.play.{id}', function ($user, $id) {
 //  $exist = Participants::query() -> where('conversation_id', $id) -> exists();
-  $exist = Friendship::query() -> where('conversation_id', $id) -> exists();
-  error_log('hey');
-  error_log($id);
-  error_log($user);
-  return $exist ? $user : false;
+ if(Auth::check()) {
+   $friendExist = Friendship::query() -> where('conversation_id', $id) -> exists();
+   $groupExist = Participants::query() -> where('conversation_id', $id) -> exists();
+   return $friendExist || $groupExist
+     ? ['id' => $user -> id, 'name' => $user -> firstName . ' ' . $user -> lastName]
+     : false;
+ }
+ return false;
 });

@@ -14,10 +14,11 @@ return new class extends Migration
     {
         Schema::create('participants', function (Blueprint $table) {
             $table->id();
-            $table->string('conversation_id');
+            $table->unsignedBigInteger('conversation_id');
             $table->string('username');
-            $table->text('last_read_message');
-            $table->timestamp('joined_at')->useCurrent();
+            $table->text('last_read_message') -> default('');
+            $table->tinyInteger('type') -> default(0);
+            $table->timestamp('created_at')->useCurrent();
 
             $table -> foreign('conversation_id') -> references('id') -> on('conversations');
         });

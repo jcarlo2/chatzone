@@ -28,6 +28,14 @@ body {
   background: var(--light-blue);
 }
 
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
 #app {
   min-height: 100vh;
   display: flex;
@@ -82,8 +90,15 @@ body {
 }
 
 .login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+}
+.login-container form {
   width: 400px;
-  height: 250px;
+  height: 150px;
   border-radius: 10px;
   display: flex;
   justify-content: center;
@@ -91,7 +106,7 @@ body {
   flex-direction: column;
   gap: 5px;
 }
-.login-container > input {
+.login-container form > input {
   border: 0;
   outline: 0;
   height: 30px;
@@ -100,7 +115,7 @@ body {
   padding: 10px;
   width: 250px;
 }
-.login-container > input[type=submit] {
+.login-container form > input[type=submit] {
   box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
   font-weight: bold;
   transition: 0.3s linear;
@@ -112,18 +127,26 @@ body {
   outline: none;
   width: 150px;
 }
-.login-container > input[type=submit]:hover {
+.login-container form > input[type=submit]:hover {
   background: #cebaba;
 }
-.login-container > input[type=submit]:active {
+.login-container form > input[type=submit]:active {
   transform: translateY(2px);
 }
-.login-container > label {
+.login-container form > label {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: row;
   gap: 5px;
+}
+.login-container > p > a, .login-container > p:nth-child(3), .login-container a > a, .login-container a:nth-child(3) {
+  cursor: pointer;
+  color: blue;
+  font-weight: bold;
+}
+.login-container > p > a:hover, .login-container > p:nth-child(3):hover, .login-container a > a:hover, .login-container a:nth-child(3):hover {
+  color: #1414ae;
 }
 
 .main-container {
@@ -175,7 +198,12 @@ body {
 .main-container section.left > div:first-child h3:hover {
   border-color: black;
 }
-.main-container section.left > div:first-child input[type=search] {
+.main-container section.left > div:first-child div.search {
+  width: 100%;
+  height: 30px;
+  position: relative;
+}
+.main-container section.left > div:first-child div.search input[type=search] {
   border: 0;
   outline: 0;
   padding: 10px;
@@ -184,19 +212,49 @@ body {
   position: sticky;
   top: 0;
 }
+.main-container section.left > div:first-child div.search ul {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  width: 100%;
+  background: beige;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  z-index: 5;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.main-container section.left > div:first-child div.search ul.show {
+  display: block;
+}
+.main-container section.left > div:first-child div.search ul li {
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: calc(100% + 0px);
+  padding: 0 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.main-container section.left > div:first-child div.search ul li:hover {
+  background: #caca7a;
+}
 .main-container section.left > div:first-child #message-list {
   width: 100%;
   border-radius: 4px;
 }
-.main-container section.left > div:first-child #message-list #unread, .main-container section.left > div:first-child #message-list #rooms, .main-container section.left > div:first-child #message-list #all-friend {
+.main-container section.left > div:first-child #message-list #rooms, .main-container section.left > div:first-child #message-list #all-friend {
   width: 100%;
   height: auto;
 }
-.main-container section.left > div:first-child #message-list #unread[open] > summary:before, .main-container section.left > div:first-child #message-list #rooms[open] > summary:before, .main-container section.left > div:first-child #message-list #all-friend[open] > summary:before {
+.main-container section.left > div:first-child #message-list #rooms[open] > summary:before, .main-container section.left > div:first-child #message-list #all-friend[open] > summary:before {
+  transition: 0.3s linear;
   transform: rotate(-90deg);
   top: calc(50% - 5px);
 }
-.main-container section.left > div:first-child #message-list #unread summary, .main-container section.left > div:first-child #message-list #rooms summary, .main-container section.left > div:first-child #message-list #all-friend summary {
+.main-container section.left > div:first-child #message-list #rooms summary, .main-container section.left > div:first-child #message-list #all-friend summary {
   list-style-type: none;
   cursor: pointer;
   font-weight: bold;
@@ -204,11 +262,11 @@ body {
   border-radius: 4px;
   padding-left: 2px;
 }
-.main-container section.left > div:first-child #message-list #unread summary:hover, .main-container section.left > div:first-child #message-list #rooms summary:hover, .main-container section.left > div:first-child #message-list #all-friend summary:hover {
+.main-container section.left > div:first-child #message-list #rooms summary:hover, .main-container section.left > div:first-child #message-list #all-friend summary:hover {
   font-style: italic;
   background: #a29e8c;
 }
-.main-container section.left > div:first-child #message-list #unread summary:before, .main-container section.left > div:first-child #message-list #rooms summary:before, .main-container section.left > div:first-child #message-list #all-friend summary:before {
+.main-container section.left > div:first-child #message-list #rooms summary:before, .main-container section.left > div:first-child #message-list #all-friend summary:before {
   content: "";
   display: inline-block;
   width: 10px;
@@ -220,7 +278,7 @@ body {
   position: absolute;
   transform: translateY(-50%);
 }
-.main-container section.left > div:first-child #message-list #unread > div, .main-container section.left > div:first-child #message-list #rooms > div, .main-container section.left > div:first-child #message-list #all-friend > div {
+.main-container section.left > div:first-child #message-list #rooms > div, .main-container section.left > div:first-child #message-list #all-friend > div {
   display: flex;
   padding: 5px;
   height: 60px;
@@ -229,31 +287,57 @@ body {
   border-radius: 4px;
   cursor: pointer;
 }
-.main-container section.left > div:first-child #message-list #unread > div:hover, .main-container section.left > div:first-child #message-list #rooms > div:hover, .main-container section.left > div:first-child #message-list #all-friend > div:hover {
+.main-container section.left > div:first-child #message-list #rooms > div:hover, .main-container section.left > div:first-child #message-list #all-friend > div:hover {
   background: #73733d;
 }
-.main-container section.left > div:first-child #message-list #unread > div > div:first-child, .main-container section.left > div:first-child #message-list #rooms > div > div:first-child, .main-container section.left > div:first-child #message-list #all-friend > div > div:first-child {
+.main-container section.left > div:first-child #message-list #rooms > div > div:first-child, .main-container section.left > div:first-child #message-list #all-friend > div > div:first-child {
   height: 50px;
   width: 60px;
   background-color: red;
 }
-.main-container section.left > div:first-child #message-list #unread > div > div:last-child, .main-container section.left > div:first-child #message-list #rooms > div > div:last-child, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child {
+.main-container section.left > div:first-child #message-list #rooms > div > div:last-child, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child {
   width: 250px;
   display: flex;
   flex-direction: column;
   gap: 5px;
   overflow: hidden;
 }
-.main-container section.left > div:first-child #message-list #unread > div > div:last-child h6, .main-container section.left > div:first-child #message-list #rooms > div > div:last-child h6, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child h6 {
+.main-container section.left > div:first-child #message-list #rooms > div > div:last-child h6, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child h6 {
   font-size: 18px;
 }
-.main-container section.left > div:first-child #message-list #unread > div > div:last-child p, .main-container section.left > div:first-child #message-list #rooms > div > div:last-child p, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child p {
+.main-container section.left > div:first-child #message-list #rooms > div > div:last-child p, .main-container section.left > div:first-child #message-list #all-friend > div > div:last-child p {
   text-overflow: ellipsis;
   overflow: hidden;
   height: 30px;
   white-space: nowrap;
   display: inline-block;
   font-size: 14px;
+}
+.main-container section.left > div:first-child #message-list #rooms {
+  display: flex;
+  flex-direction: column;
+}
+.main-container section.left > div:first-child #message-list #rooms > input[type=button] {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  margin: 10px auto;
+  background-color: #829cd0;
+}
+.main-container section.left > div:first-child #message-list #rooms > input[type=button]:hover {
+  background: #cebaba;
+}
+.main-container section.left > div:first-child #message-list #rooms > input[type=button]:active {
+  transform: translateY(2px);
+}
+.main-container section.left > div:first-child #message-list #rooms > input[type=button]:hover {
+  background-color: #677ba3;
 }
 .main-container section.left > div:last-child {
   display: flex;
@@ -352,7 +436,7 @@ body {
 .main-container section.right > ul > li > div > span {
   width: 35px;
   height: 35px;
-  background-color: red;
+  background-color: rgb(185, 185, 170);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -519,8 +603,11 @@ body {
   height: 50px;
 }
 .connect-modal > section > table tbody tr td:last-child {
+  flex: 1;
   width: 100px;
   height: 50px;
+  display: flex;
+  gap: 5px;
 }
 .connect-modal > section > table tbody tr td:last-child > input {
   box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
@@ -533,6 +620,7 @@ body {
   border: 0;
   outline: none;
   height: 50px;
+  padding: 5px;
   background: linear-gradient(#68d5b5, #8ea926);
 }
 .connect-modal > section > table tbody tr td:last-child > input:hover {
@@ -551,10 +639,67 @@ body {
 .connect-modal > section > table tbody tr td:nth-child(2) p {
   font-weight: bold;
   text-align: center;
-  width: 300px;
+  width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+#registerContainer {
+  display: flex;
+  flex-direction: column;
+}
+#registerContainer p {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+#registerContainer p > a {
+  color: blue;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: bold;
+}
+#registerContainer p > a:hover {
+  color: #1414ae;
+}
+#registerContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+#registerContainer form input {
+  height: 30px;
+  width: 200px;
+  border: 0;
+  outline: none;
+  border-radius: 2px;
+  padding: 0 10px;
+}
+#registerContainer form input[type=submit] {
+  background-color: #cae04e;
+  width: 150px;
+  border-radius: 6px;
+  font-weight: bold;
+  border: 0 !important;
+  cursor: pointer;
+  transition: 0.3s linear;
+}
+#registerContainer form input[type=submit]:active {
+  transform: translateY(-2px);
+}
+#registerContainer form > fieldset {
+  height: 50px;
+  padding: 0 5px;
+  width: 200px;
+}
+#registerContainer form > fieldset > legend {
+  font-weight: bold;
+  padding: 0 5px;
+}
+#registerContainer form > fieldset > input {
+  width: 100%;
 }
 
 /*# sourceMappingURL=app.css.map */

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('friendships', function (Blueprint $table) {
           $table -> id();
-          $table -> string('conversation_id');
+          $table -> unsignedBigInteger('conversation_id');
           $table -> string('user_id');
           $table -> string('friend_id');
           $table -> string('status');
