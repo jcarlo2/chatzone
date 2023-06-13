@@ -10,6 +10,8 @@
 - **Manage Private And Group Chat** *(soon)*  
 - **Manage Profile** *(soon)*  
     
+> This is a personal project to enhance and exercise my knowledge with ReactJs, Laravel, and InertiaJs. 
+
 ## Login
 ![Alt text](image.png)
 ## Register
@@ -26,4 +28,4 @@
 ![Alt text](image-7.png)  
 ![Alt text](image-8.png)
 
-> This is a personal project to enhance and exercise my knowledge with ReactJs, Laravel, and InertiaJs. 
+
