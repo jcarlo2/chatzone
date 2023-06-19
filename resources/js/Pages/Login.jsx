@@ -15,7 +15,8 @@ const Login = ()=> {
   }
 
   return (
-    <MainLayout>
+    <>
+      <img src="images/logo.png" alt="" />
       <section className={'login-container'}>
         <form onSubmit={handleLogin}>
           {errors.username && <div className={'invalid'}>{errors.username}</div>}
@@ -31,7 +32,7 @@ const Login = ()=> {
         <p>Does not have an account yet? <Link href={'/register'}>Register now</Link></p>
         <Link href={'/forgot'}>Forgot password</Link>
       </section>
-    </MainLayout>
+    </>
   )
 }
 

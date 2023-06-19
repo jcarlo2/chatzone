@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\Participants;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
   return to_route('main');
@@ -22,6 +23,8 @@ Route::controller(UserController::class) -> group(function() {
   Route::post('/user/search','search') -> middleware('auth');
   Route::post('/user/update-friend-status','updateFriendStatus') -> middleware('auth');
   Route::post('/user/create-group','createGroup') -> middleware('auth');
+  Route::post('/user/profile-update','profileUpdate') -> middleware('auth');
+  Route::get('/profile', 'showProfile') -> middleware('auth');
 });
 
 Route::post('/event',function() {

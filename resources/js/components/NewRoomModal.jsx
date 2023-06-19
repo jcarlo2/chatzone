@@ -27,7 +27,6 @@ const NewRoomModal = forwardRef(({friendList, setGroup}, ref)=> {
 			onFinish: ()=> submit.current.disabled = false,
 			onError: ()=> submit.current.disabled = false,
 			onSuccess: (e)=> {
-				console.log(e)
 				setGroup(e.props.groups)
 				reset()
 				ref.current.classList.add('hidden')

@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react'
 import EmojiPicker, {EmojiStyle} from "emoji-picker-react";
 import Echo from "laravel-echo"
 import Pusher from 'pusher-js'
-import {useForm, usePage} from "@inertiajs/react";
+import {useForm, usePage, router} from "@inertiajs/react";
 import MainLayout from "./Layout/MainLayout.jsx";
 import ConnectModal from "../components/ConnectModal.jsx";
 import NewRoomModal from "../components/NewRoomModal.jsx";
@@ -13,6 +13,7 @@ const Main = ()=> {
   const csrf = usePage().props.csrf
   const {id, username, firstName, lastName} = usePage().props.user
   const [friendList, setFriendList] = useState(usePage().props.friends)
+  const [blockList, setBlockList] = useState(usePage().props.blocks)
   const [groupList, setGroupList] = useState(usePage().props.groups)
   const [activeChat, setActiveChat] = useState({
     fullName: '',
@@ -30,6 +31,7 @@ const Main = ()=> {
   const float = useRef()
   const connectModal = useRef()
   const newGroupModal = useRef()
+  const profileModal = useRef()
   const searchList = useRef()
   const search = useRef()
   const {data, setData, processing} = useForm({
@@ -246,6 +248,10 @@ const Main = ()=> {
     }
   }
 
+  const handleProfile = ()=> {
+	  router.get('/profile')
+  }
+
   const handleEmojiContainer = ()=> {
     const isVisible = emoji.current.style.display === 'block'
     if(isVisible) emoji.current.style.display = 'none'
@@ -287,105 +293,119 @@ const Main = ()=> {
 
   return (
     <>
-      <ConnectModal ref={connectModal} csrf={csrf}/>
-      <NewRoomModal ref={newGroupModal} friendList={friendList} setGroup={setGroupList}/>
-      <MainLayout>
-        <main className={'main-container'}>
-          <section className={'left'}>
-            <div>
-              <h3>{firstName} {lastName}<span></span></h3>
-              <div className={'search'}>
-                <input ref={search} type="search" placeholder={'Search a friend...'} onChange={handleSearchSuggestion} />
-                <ul ref={searchList} className={'search-list'}>
-                  {
-                    searchSuggestionList.map(item => (
-                      <li key={item.conversationId} onClick={()=> {
-                        setDoScroll(true)
-                        handleActiveChat(item)
-                        search.current.value = ''
-                        searchList.current.classList.remove('show')
-                      }}>{item.fullName}</li>
-                    ))
-                  }
-                </ul>
-              </div>
-              <div id={'message-list'}>
-                <details id={'rooms'}>
-                  <summary>Chat Rooms</summary>
-                  <input type='button' defaultValue={'Create New Room'} onClick={handleCreateNewGroup}/>
-                  {
-                    groupList.map(group => (
-                      <div key={group.conversationId} onClick={()=> handleActiveChat(group)}>
-                        <div></div>
-                        <div>
-                          <h6>{group.fullName}</h6>
-                          <p>
-                            {group.isLastSender ? 'You: ' : ''} {group.lastMessage}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </details>
-                <details id={'all-friend'}>
-                  <summary>All Friend</summary>
-                  {
-                    friendList.map(friend => (
-                      <div key={friend.conversationId} onClick={()=> handleActiveChat(friend)}>
-                        <div></div>
-                        <div>
-                          <h6>{friend.fullName}</h6>
-                          <p>
-                            {friend.isLastSender ? 'You: ' : ''} {friend.lastMessage}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </details>
-              </div>
-            </div>
-            <div>
-              <input type="button" className={'btn'} defaultValue={'Connect with Others'} onClick={(e)=> {
-                e.preventDefault()
-                connectModal.current.classList.remove('hidden')
-              }}/>
-            </div>
-          </section>
-          <section className={'right'}>
-            <div>
-              <h4>{activeChat.fullName}</h4>
-              <span></span>
-            </div>
-            <ul ref={messageList} onScroll={handleMessageListScroll}>
-              <div></div>
-              {
-                contentList.map(message => (
-                  <li key={message.id} id={`message${message.id}`} className={(username === message.username ? 'main ' : '') + message.username}>
-                    <span style={{ display: handleHide(message) ? 'none' : '' }}>{message.fullName}</span>
-                    <div>
-                    <span
-                      style={{ opacity: contentList[contentList.indexOf(message) + 1]?.username === message.username ? '0' : '1' }}
-                    >{message.initial}</span>
-                      <p>{message.content}</p>
-                    </div>
-                  </li>
-                ))
-              }
-            </ul>
-            <p ref={float}>Someone is typing <span></span></p>
-            <div>
-              <div onClick={handleEmojiContainer}>
-                <div ref={emoji}>
-                  <EmojiPicker onEmojiClick={handleEmojiPicker} emojiStyle={EmojiStyle.GOOGLE} />
-                </div>
-              </div>
-              <textarea ref={messageBox} name={'text'} tabIndex={0} onChange={(e)=> setData('message',e.currentTarget.value)}></textarea>
-              <input type="button" className={'btn'} defaultValue={'Send'} disabled={processing} onClick={sendMessage}/>
-            </div>
-          </section>
-        </main>
-      </MainLayout>
+		{/* <ProfileModal 
+			ref={profileModal} 
+			friendList={friendList} 
+			setFriendList={setFriendList} 
+			blockList={blockList} 
+			setBlockList={setBlockList}
+		/> */}
+		<ConnectModal 
+			ref={connectModal} 
+			csrf={csrf}
+		/>
+		<NewRoomModal 
+			ref={newGroupModal} 
+			friendList={friendList} 
+			setGroup={setGroupList}
+		/>
+		<MainLayout>
+			<main className={'main-container'}>
+				<section className={'left'}>
+					<div>
+						<h3 onClick={handleProfile}>{firstName} {lastName}<span></span></h3>
+						<div className={'search'}>
+							<input ref={search} type="search" placeholder={'Search a friend or room ...'} onChange={handleSearchSuggestion} />
+							<ul ref={searchList} className={'search-list'}>
+								{
+								searchSuggestionList.map(item => (
+									<li key={item.conversationId} onClick={()=> {
+									setDoScroll(true)
+									handleActiveChat(item)
+									search.current.value = ''
+									searchList.current.classList.remove('show')
+									}}>{item.fullName}</li>
+								))
+								}
+							</ul>
+						</div>
+						<div id={'message-list'}>
+						<details id={'rooms'}>
+							<summary>Chat Rooms</summary>
+							<input type='button' defaultValue={'Create New Room'} onClick={handleCreateNewGroup}/>
+							{
+								groupList.map(group => (
+									<div key={group.conversationId} onClick={()=> handleActiveChat(group)}>
+									<div></div>
+									<div>
+										<h6>{group.fullName}</h6>
+										<p>
+										{group.isLastSender ? 'You: ' : ''} {group.lastMessage}
+										</p>
+									</div>
+									</div>
+								))
+							}
+						</details>
+						<details id={'all-friend'}>
+							<summary>All Friend</summary>
+							{
+								friendList.map(friend => (
+									<div key={friend.conversationId} onClick={()=> handleActiveChat(friend)}>
+									<div></div>
+									<div>
+										<h6>{friend.fullName}</h6>
+										<p>
+										{friend.isLastSender ? 'You: ' : ''} {friend.lastMessage}
+										</p>
+									</div>
+									</div>
+								))
+							}
+						</details>
+						</div>
+					</div>
+					<div>
+						<input type="button" className={'btn'} defaultValue={'Connect with Others'} onClick={(e)=> {
+							e.preventDefault()
+							connectModal.current.classList.remove('hidden')
+						}}/>
+					</div>
+				</section>
+				<section className={'right'}>
+					<div>
+						<h4>{activeChat.fullName}</h4>
+						<span></span>
+					</div>
+					<ul ref={messageList} onScroll={handleMessageListScroll}>
+						<div></div>
+						{
+							contentList.map(message => (
+								<li key={message.id} id={`message${message.id}`} className={(username === message.username ? 'main ' : '') + message.username}>
+									<span style={{ display: handleHide(message) ? 'none' : '' }}>{message.fullName}</span>
+									<div>
+										<span
+											style={{ opacity: contentList[contentList.indexOf(message) + 1]?.username === message.username ? '0' : '1' }}
+										>{message.initial}</span>
+										<p>{message.content}</p>
+									</div>
+								</li>
+							))
+						}
+					</ul>
+					<p ref={float}>Someone is typing <span></span></p>
+					<div>
+						<div onClick={handleEmojiContainer}>
+							<div ref={emoji}>
+								<EmojiPicker onEmojiClick={handleEmojiPicker} emojiStyle={EmojiStyle.GOOGLE} />
+							</div>
+						</div>
+						<textarea ref={messageBox} name={'text'} tabIndex={0} onChange={(e)=> setData('message',e.currentTarget.value)}></textarea>
+						<input type="button" className={'btn'} defaultValue={'Send'} disabled={processing} onClick={sendMessage}/>
+					</div>
+				</section>
+			</main>
+		</MainLayout>
     </>
   )
 }

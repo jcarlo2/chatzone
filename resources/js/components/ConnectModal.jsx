@@ -25,7 +25,7 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
       }).catch(console.log)
   }
 
-  const handleStrangerStatus = (e, id)=> {
+  const handleStrangerStatus = (e, id, type)=> {
     const status = e.currentTarget.value
     fetch(`${url}/user/update-friend-status`,{
       method: 'POST',
@@ -38,6 +38,7 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
       .then(res => {
         if(res.ok) {
           res.json().then(({status, friendId}) => {
+             if(type === 'change') {
               setSearchList(prevState => prevState.map(stranger => {
                 if(stranger.id === friendId) return {
                   ...stranger,
@@ -45,6 +46,9 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
                 }
                 return stranger
               }))
+             } else {
+              setSearchList(prevState => prevState.filter(state => state.id !== friendId))
+             }
           })
         }
       }).catch(console.log)
@@ -81,7 +85,7 @@ const ConnectModal = forwardRef(({csrf},ref)=> {
                           : stranger.status === 'Friend'
                           ? 'Unfriend'
                           : stranger.status
-                      } onClick={(e)=> handleStrangerStatus(e, stranger.id)}/>
+                      } onClick={(e)=> handleStrangerStatus(e, stranger.id,'change')}/>
                       <input type="button" defaultValue={
                         stranger.status === 'Pending Approved'
                           ? 'Decline'

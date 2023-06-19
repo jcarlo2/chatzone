@@ -12,8 +12,22 @@ class UserService {
   public function findAllFriends($username): array {
     $friends = Friendship::query()
       ->where('user_id', $username)
-      ->where('status', 'FRIEND')
+      ->where('status', 'Friend')
       -> get();
+    $friendList = $this -> setFriendList($friends, $username);
+    return $friendList;
+  }
+
+  public function findAllFriendsForProfile($username): array {
+    $friends = Friendship::query()
+      ->where('user_id', $username)
+      ->whereIn('status', ['Friend','Pending Request', 'Pending Approved'])
+      -> get(); 
+    $friendList = $this -> setFriendList($friends, $username);
+    return $friendList;
+  }
+
+  private function setFriendList($friends, $username) {
     $friendList = array();
     foreach ($friends as $friend) {
       $friendUsername = $username === $friend -> user_id
@@ -29,7 +43,9 @@ class UserService {
       $friendList[] = [
         'conversationId' => $friend->conversation_id,
         'username' => $friendUsername,
+        'id' => $friendEntity -> id,
         'fullName' => $friendEntity -> firstName . ' ' . $friendEntity -> lastName,
+        'initial' => substr($friendEntity -> firstName, 0, 1) . substr($friendEntity -> lastName, 0, 1),
         'status' => $friend->status,
         'lastMessage' => $lastMessage !== null ? $lastMessage -> message : '',
         'isLastSender' => $lastMessage === null ? false : Auth::user() -> username === $lastMessage -> username,
@@ -63,7 +79,7 @@ class UserService {
         'fullName' => $conversation -> name
       ];
     }
-    return $list;`
+    return $list;
   }
 
   public function findAllMessages(): array {
@@ -90,6 +106,28 @@ class UserService {
       'url' => $messageList,
       'list' => array_reverse($list)
     ];
+  }
+
+  public function findAllBlockedUser() {
+    $blockList = Friendship::query()
+        -> where('user_id', Auth::user() -> username)
+        -> where('status', 'Blocked 0')
+        -> get();
+
+    $list = array();
+    foreach($blockList as $block) {
+        $user = User::query() 
+            -> where('username', $block -> friend_id)
+            -> first();
+        $list[] = [
+            'id' => $block -> id,
+            'conversationId' => $block -> conversation_id,
+            'friendId' => $block -> friend_id,
+            'fullName' => $user -> firstName . ' ' . $user -> lastName,
+            'initial' => substr($user -> firstName, 0, 1) . substr($user -> lastName, 0, 1),
+        ];
+    }
+    return $list;
   }
 
   public function search(): array {
@@ -127,7 +165,6 @@ class UserService {
         ];
       }
     }
-
     return $list;
   }
 
@@ -206,5 +243,17 @@ class UserService {
     $participants -> last_read_message = '';
     $participants -> sender = '';
     $participants -> save();
+  }
+
+  function profileUpdate() {
+    $username = request('username');
+    if(Auth::user() -> username === $username) {
+      $user = User::query() -> where('username', $username) -> first();
+      $user -> firstName = request('firstName');
+      $user -> lastName = request('lastName');
+      $user -> email = request('email');
+      $user -> gender = request('gender');
+      $user -> save();
+    }
   }
 }
