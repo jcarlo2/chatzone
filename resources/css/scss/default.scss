@@ -6,7 +6,8 @@
 
 :root {
   --light-blue: linear-gradient(45deg, #78b2be, #5293a9, #F7D8E0);
-  --light-blue-contrast: linear-gradient(135deg, #00A8E8, #0077B6, #023E8A)
+  --light-blue-contrast: linear-gradient(135deg, #00A8E8, #0077B6, #023E8A);
+  --white: rgb(247, 247, 247);
 }
 
 body {
@@ -74,6 +75,12 @@ ul {
   color: #9e2121;
   font-weight: bold;
 }
+
+.success {
+  font-size: 14px;
+   color: var(--white);
+   font-weight: bold;
+ }
 
 ::-webkit-scrollbar {
   width: 3px;
