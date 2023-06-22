@@ -1037,6 +1037,30 @@ ul {
 .profile-container > .friend > table tbody tr td:last-child > input:nth-child(2), .profile-container > .block > table tbody tr td:last-child > input:nth-child(2) {
   background: linear-gradient(#acb6b3, #81827b);
 }
+.profile-container a {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 0;
+  font-size: 16px;
+  background-color: rgb(168, 181, 26);
+}
+.profile-container a:hover {
+  background: #cebaba;
+}
+.profile-container a:active {
+  transform: translateY(2px);
+}
 
 #registerContainer {
   display: flex;
@@ -1148,6 +1172,60 @@ ul {
 .reset-container a span {
   color: blue;
   cursor: pointer;
+}
+
+.change-password {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.change-password > a {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgrey;
+}
+.change-password > a:hover {
+  background: #cebaba;
+}
+.change-password > a:active {
+  transform: translateY(2px);
+}
+.change-password > input[type=password] {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 200px;
+  border-radius: 3px;
+  padding: 0 10px;
+}
+.change-password > input[type=submit] {
+  box-shadow: 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  transition: 0.3s linear;
+  cursor: pointer;
+  height: 30px;
+  width: 150px;
+  border-radius: 4px;
+  border: 0;
+  outline: none;
+  background-color: rgb(168, 181, 26);
+}
+.change-password > input[type=submit]:hover {
+  background: #cebaba;
+}
+.change-password > input[type=submit]:active {
+  transform: translateY(2px);
 }
 
 /*# sourceMappingURL=app.css.map */

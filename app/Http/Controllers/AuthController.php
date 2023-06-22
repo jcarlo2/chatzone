@@ -44,12 +44,16 @@ class AuthController extends Controller
 
   public function verify(): RedirectResponse
   {
+    $remember = request('remember_me');
+    error_log($remember ? 'TRUE' : 'FALSE');
+
     $credentials = request()->validate([
       'username' => 'required',
       'password' => 'required|min:8'
     ]);
 
-    if (Auth::attempt($credentials)) {
+
+    if (Auth::attempt($credentials, request('remember_me'))) {
       request()->session()->regenerate();
       return redirect()->intended('main');
     }
@@ -58,7 +62,7 @@ class AuthController extends Controller
       'username' => 'Invalid username or password. Please check your credentials and try again.',
     ]);
   }
-
+  
   public function logout(): RedirectResponse
   {
     Auth::logout();

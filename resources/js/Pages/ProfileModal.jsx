@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
-import { router, useForm, usePage } from "@inertiajs/react";
+import { Link, router, useForm, usePage } from "@inertiajs/react";
 import MainLayout from "./Layout/MainLayout";
 import GlobalContext from "../context/GlobalContext";
 
@@ -177,7 +177,7 @@ const ProfileModal = () => {
             <option value="other">Others</option>
           </select>
           <input type="submit" value="Save" />
-          <input type="button" defaultValue={"Change Password"} />
+          <Link href={'/user/change-password'}>Change Password</Link>
         </form>
 
         <div ref={friend} className="friend hidden">

@@ -135,4 +135,10 @@
 			}
 		}
 	 }
+   a {
+    @include defaultBtn;
+    @include flexCenter(row, 0);
+    font-size: 16px;
+    background-color: rgb(168, 181, 26);
+   }
 }

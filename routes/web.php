@@ -17,7 +17,7 @@ Route::get('/', function () {
 Route::controller(AuthController::class)->group(function () {
   Route::get('/reset-password/{token}', 'resetPassword') -> name('reset.password');
   Route::post('/reset-password}', 'resetPasswordPost') -> name('reset.password.post');
-  Route::get('/forgot-password', 'forgotPassword')->middleware('guest');
+  Route::get('/forgot-password', 'forgotPassword');
   Route::post('/forgot-password', 'forgotPasswordPost')->middleware('guest');
   Route::get('/register', 'create')->middleware('guest');
   Route::post('/register', 'store');
@@ -28,11 +28,13 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(UserController::class)->group(function () {
   Route::get('/main', 'showMain')->middleware('auth')->name('main');
+  Route::get('/profile', 'showProfile')->middleware('auth') -> name('profile');
+  Route::get('/user/change-password', 'changePassword')->middleware('auth');
+  Route::post('/user/change-password', 'changePasswordPost')->middleware('auth');
   Route::post('/user/search', 'search')->middleware('auth');
   Route::post('/user/update-friend-status', 'updateFriendStatus')->middleware('auth');
   Route::post('/user/create-group', 'createGroup')->middleware('auth');
   Route::post('/user/profile-update', 'profileUpdate')->middleware('auth');
-  Route::get('/profile', 'showProfile')->middleware('auth');
 });
 
 Route::post('/event', function () {

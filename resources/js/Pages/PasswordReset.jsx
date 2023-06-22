@@ -39,8 +39,8 @@ const PasswordReset = () => {
           />
           <input ref={reset} type="submit" value="Reset Password" />
         </form>
-        <Link href="/login">
-          Already have an account? <span>Sign in</span>
+        <Link href="/">
+          Incase you want to go back <span>Click here</span>
         </Link>
       </div>
     </>

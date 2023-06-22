@@ -6,11 +6,11 @@ const Login = () => {
   const [message, setMessage] = useState(undefined)
 
   useEffect(()=> setMessage(page.success),[page])
-
+  
   const { setData, processing, post, errors } = useForm({
     username: "",
     password: "",
-    remember: false,
+    remember_me: false,
   });
 
   const handleLogin = (e) => {
@@ -30,7 +30,6 @@ const Login = () => {
           <input
             type="text"
             placeholder={"Username"}
-            name={"username"}
             onChange={(e) => setData("username", e.target.value)}
           />
           {errors.password && (
@@ -39,15 +38,13 @@ const Login = () => {
           <input
             type="password"
             placeholder={"Password"}
-            name={"password"}
             onChange={(e) => setData("password", e.target.value)}
           />
           <label>
             Remember Me
             <input
               type="checkbox"
-              name={"remember"}
-              onChange={(e) => setData("remember", e.target.checked)}
+              onChange={(e) => setData("remember_me", e.target.checked)}
             />
           </label>
           <input type="submit" defaultValue={"Login"} disabled={processing} />
