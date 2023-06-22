@@ -3,16 +3,20 @@
 use App\Events\PlayEvent;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Mail\ResetPassword;
 use App\Models\Friendship;
 use App\Models\Message;
 use App\Models\Participants;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
   return to_route('main');
 })->middleware('auth');
+
+Route::get('/email', function() {
+  return new ResetPassword('123456');
+});
 
 Route::controller(AuthController::class)->group(function () {
   Route::get('/reset-password/{token}', 'resetPassword') -> name('reset.password');

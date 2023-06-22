@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPassword;
 use Illuminate\Http\Response as Res;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
@@ -98,11 +99,11 @@ class AuthController extends Controller
           'created_at' => Carbon::now()
         ]);
     }
-
-    Mail::send('reset-password', ['token' => $token], function ($message) {
-      $message->to(request('email'));
-      $message->subject('Reset Password');
-    });
+    Mail::to(request('email'))->send(new ResetPassword($token));
+    // Mail::send('reset-password', ['token' => $token], function ($message) {
+    //   $message->to(request('email'));
+    //   $message->subject('Reset Password');
+    // });
 
     return Inertia::render('PasswordReset', [
       'success' => 'Please check your email for instructions on how to reset your password.'
@@ -125,12 +126,12 @@ class AuthController extends Controller
       'token' => 'required'
     ]);
 
-    // delete reset token
+    // get reset token
     $reset = PasswordResetToken::query()
       ->where('token', request('token'))
       ->where('email', request('email'))
       ->first();
-    // check and change password
+    // check, delete token, and change password
     if ($reset) {
       $reset->delete();
       User::query()
